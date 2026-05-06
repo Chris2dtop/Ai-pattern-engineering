@@ -78,14 +78,62 @@ export const designerDraft = {
 };
 
 export const pomRows = [
-  ["JKT-001", "Chest circumference", "48 in", "+/- 0.5 in"],
-  ["JKT-002", "Across shoulder", "22 in", "+/- 0.375 in"],
-  ["JKT-003", "Front body length from HSP", "27 in", "+/- 0.5 in"],
-  ["JKT-004", "Back body length from HSP", "28 in", "+/- 0.5 in"],
-  ["JKT-005", "Sleeve length from HSP", "34 in", "+/- 0.5 in"],
-  ["JKT-006", "Detachable sleeve seam circumference", "15 in", "+/- 0.25 in"],
-  ["JKT-007", "Sleeve flap width", "1.25 in", "+/- 0.125 in"],
-  ["JKT-008", "Asymmetric front extension length", "4 in", "Review"],
+  [
+    "1-1",
+    "Chest below armhole",
+    "Straight across below armhole from side to side.",
+    "48 in",
+    "+/- 0.5 in",
+  ],
+  [
+    "1-8",
+    "Across shoulder",
+    "Straight across highest armhole points from seam to seam.",
+    "22 in",
+    "+/- 0.375 in",
+  ],
+  [
+    "1-11",
+    "Front length from HPS",
+    "High point shoulder straight down to front bottom edge.",
+    "27 in",
+    "+/- 0.5 in",
+  ],
+  [
+    "1-13",
+    "Back length from CBN",
+    "Center back neck straight down to back bottom edge.",
+    "28 in",
+    "+/- 0.5 in",
+  ],
+  [
+    "1-22",
+    "Sleeve length from CBN",
+    "Center back neck to shoulder point, then along sleeve fold.",
+    "34 in",
+    "+/- 0.5 in",
+  ],
+  [
+    "EXP-001",
+    "Detachable sleeve seam circumference",
+    "Around sleeve attachment seam where modules connect.",
+    "15 in",
+    "+/- 0.25 in",
+  ],
+  [
+    "EXP-002",
+    "Sleeve flap width",
+    "Across flap covering detachable sleeve closure.",
+    "1.25 in",
+    "+/- 0.125 in",
+  ],
+  [
+    "EXP-004",
+    "Asymmetric front extension length",
+    "Standard front hem reference to lowest extension point.",
+    "4 in",
+    "Review",
+  ],
 ];
 
 export const bomRows = [

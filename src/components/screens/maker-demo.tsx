@@ -27,7 +27,7 @@ export function MakerDemo({ projectId }: MakerDemoProps) {
 
       <SectionCard title="POM chart" eyebrow="Editable">
         <EditableTable
-          columns={["Code", "Measurement", "Size M", "Tolerance"]}
+          columns={["Code", "Measurement", "How to measure", "Size M", "Tolerance"]}
           rows={pomRows}
         />
       </SectionCard>
