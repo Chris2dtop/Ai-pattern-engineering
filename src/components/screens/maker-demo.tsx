@@ -1,14 +1,31 @@
+"use client";
+
 import Link from "next/link";
+import { useProjectDraft } from "@/components/project-state";
 import { EditableTable } from "@/components/ui/editable-table";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { bomRows, constructionSteps, pomRows } from "@/lib/mock/demo-project";
 
 type MakerDemoProps = {
   projectId: string;
 };
 
 export function MakerDemo({ projectId }: MakerDemoProps) {
+  const { draft, setBomRows, setPomRows } = useProjectDraft();
+  const pomRows = draft.maker.pomRows.map((row) => [
+    row.code,
+    row.measurement,
+    row.howToMeasure,
+    row.sizeValue,
+    row.tolerance,
+  ]);
+  const bomRows = draft.maker.bomRows.map((row) => [
+    row.category,
+    row.material,
+    row.placement,
+    row.notes,
+  ]);
+
   return (
     <div className="grid gap-5">
       <SectionCard
@@ -17,11 +34,7 @@ export function MakerDemo({ projectId }: MakerDemoProps) {
         action={<StatusBadge tone="warning">Review required</StatusBadge>}
       >
         <p className="max-w-4xl leading-7 text-ink/70">
-          Oversized asymmetric jacket with separate left/right front body logic,
-          mixed wool and leather shell panels, full satin lining, detachable
-          lower sleeve modules, hidden zipper/flap attachment, and irregular hem.
-          Pattern maker should verify sleeve attachment circumference, leather
-          panel reinforcement, back body shape, and sculptural collar support.
+          {draft.maker.technicalOverview}
         </p>
       </SectionCard>
 
@@ -29,6 +42,18 @@ export function MakerDemo({ projectId }: MakerDemoProps) {
         <EditableTable
           columns={["Code", "Measurement", "How to measure", "Size M", "Tolerance"]}
           rows={pomRows}
+          onRowsChange={(rows) =>
+            setPomRows(
+              rows.map((row, index) => ({
+                id: draft.maker.pomRows[index]?.id ?? `pom-${index + 1}`,
+                code: row[0] ?? "",
+                measurement: row[1] ?? "",
+                howToMeasure: row[2] ?? "",
+                sizeValue: row[3] ?? "",
+                tolerance: row[4] ?? "",
+              })),
+            )
+          }
         />
       </SectionCard>
 
@@ -36,12 +61,23 @@ export function MakerDemo({ projectId }: MakerDemoProps) {
         <EditableTable
           columns={["Category", "Material", "Placement", "Notes"]}
           rows={bomRows}
+          onRowsChange={(rows) =>
+            setBomRows(
+              rows.map((row, index) => ({
+                id: draft.maker.bomRows[index]?.id ?? `bom-${index + 1}`,
+                category: row[0] ?? "",
+                material: row[1] ?? "",
+                placement: row[2] ?? "",
+                notes: row[3] ?? "",
+              })),
+            )
+          }
         />
       </SectionCard>
 
       <SectionCard title="Construction notes" eyebrow="Draft sequence">
         <ol className="grid gap-3">
-          {constructionSteps.map((step, index) => (
+          {draft.maker.constructionSteps.map((step, index) => (
             <li key={step} className="rounded-md border border-line bg-paper p-3">
               <span className="mr-2 font-semibold">{index + 1}.</span>
               {step}

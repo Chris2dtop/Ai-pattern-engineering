@@ -1,14 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import { useProjectDraft } from "@/components/project-state";
 import { EditableTextarea } from "@/components/ui/editable-textarea";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { designerDraft } from "@/lib/mock/demo-project";
 
 type DesignerDemoProps = {
   projectId: string;
 };
 
 export function DesignerDemo({ projectId }: DesignerDemoProps) {
+  const { draft, updateDesignerText } = useProjectDraft();
+
   return (
     <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
       <SectionCard
@@ -40,12 +44,27 @@ export function DesignerDemo({ projectId }: DesignerDemoProps) {
         action={<StatusBadge tone="success">Draft ready</StatusBadge>}
       >
         <div className="grid gap-4">
-          <EditableTextarea label="Garment summary" value={designerDraft.summary} />
-          <EditableTextarea label="Silhouette and fit" value={designerDraft.silhouette} />
-          <EditableTextarea label="Materials" value={designerDraft.materials} />
+          <EditableTextarea
+            label="Garment summary"
+            value={draft.designerText.summary}
+            onChange={(summary) => updateDesignerText({ summary })}
+          />
+          <EditableTextarea
+            label="Silhouette and fit"
+            value={draft.designerText.silhouette}
+            onChange={(silhouette) => updateDesignerText({ silhouette })}
+          />
+          <EditableTextarea
+            label="Materials"
+            value={draft.designerText.materials}
+            onChange={(materials) => updateDesignerText({ materials })}
+          />
           <EditableTextarea
             label="Special features"
-            value={designerDraft.specialFeatures}
+            value={draft.designerText.specialFeatures}
+            onChange={(specialFeatures) =>
+              updateDesignerText({ specialFeatures })
+            }
           />
           <Link
             href={`/projects/${projectId}/maker`}

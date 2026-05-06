@@ -1,25 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type EditableTableProps = {
   columns: string[];
   rows: string[][];
+  onRowsChange?: (rows: string[][]) => void;
 };
 
-export function EditableTable({ columns, rows }: EditableTableProps) {
+export function EditableTable({ columns, rows, onRowsChange }: EditableTableProps) {
   const [tableRows, setTableRows] = useState(rows);
 
+  useEffect(() => {
+    setTableRows(rows);
+  }, [rows]);
+
   function updateCell(rowIndex: number, columnIndex: number, value: string) {
-    setTableRows((current) =>
-      current.map((row, index) =>
+    setTableRows((current) => {
+      const nextRows = current.map((row, index) =>
         index === rowIndex
           ? row.map((cell, cellIndex) =>
               cellIndex === columnIndex ? value : cell,
             )
           : row,
-      ),
-    );
+      );
+      onRowsChange?.(nextRows);
+      return nextRows;
+    });
   }
 
   return (

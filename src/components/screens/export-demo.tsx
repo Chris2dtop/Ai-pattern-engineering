@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useProjectDraft } from "@/components/project-state";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { exportChecklist } from "@/lib/mock/demo-project";
 
 export function ExportDemo() {
+  const {
+    draft,
+    setExportWarningsAccepted,
+    updateChecklistItem,
+  } = useProjectDraft();
   const [exportState, setExportState] = useState<"idle" | "running" | "done">(
     "idle",
   );
@@ -23,14 +28,23 @@ export function ExportDemo() {
         action={<StatusBadge tone="warning">Exports include warnings</StatusBadge>}
       >
         <div className="grid gap-3">
-          {exportChecklist.map(([label, complete]) => (
+          {draft.exportReview.checklist.map((item) => (
             <div
-              key={label}
+              key={item.id}
               className="flex items-center justify-between gap-3 rounded-md border border-line p-3"
             >
-              <span className="text-sm font-medium">{label}</span>
-              <StatusBadge tone={complete ? "success" : "warning"}>
-                {complete ? "Ready" : "Warning"}
+              <label className="flex items-center gap-3 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={item.complete}
+                  onChange={(event) =>
+                    updateChecklistItem(item.id, event.target.checked)
+                  }
+                />
+                {item.label}
+              </label>
+              <StatusBadge tone={item.complete ? "success" : "warning"}>
+                {item.complete ? "Ready" : "Warning"}
               </StatusBadge>
             </div>
           ))}
@@ -62,6 +76,18 @@ export function ExportDemo() {
               ? "Generating..."
               : "Exports generated"}
         </button>
+
+        <label className="mt-4 flex items-center gap-3 rounded-md border border-line p-3 text-sm">
+          <input
+            type="checkbox"
+            checked={draft.exportReview.warningsAccepted}
+            onChange={(event) =>
+              setExportWarningsAccepted(event.target.checked)
+            }
+          />
+          I accept unresolved Pattern Map and back-view warnings for this mock
+          export.
+        </label>
 
         {exportState === "done" ? (
           <p className="mt-4 rounded-md border border-moss/30 bg-moss/10 p-3 text-sm text-moss">
