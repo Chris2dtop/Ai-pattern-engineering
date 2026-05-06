@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { demoProject } from "@/lib/mock/demo-project";
 
 const demoProjects = [
   {
-    id: "demo",
-    name: "Asymmetric detachable jacket",
-    status: "Draft",
-    updated: "Sprint 0",
+    id: demoProject.id,
+    name: demoProject.name,
+    status: demoProject.status,
+    updated: demoProject.updated,
   },
 ];
 
@@ -43,7 +44,7 @@ export default function ProjectsPage() {
                     Last updated: {project.updated}
                   </p>
                 </div>
-                <StatusBadge tone="info">{project.status}</StatusBadge>
+                <StatusBadge tone="success">{project.status}</StatusBadge>
               </div>
             </Link>
           ))}
