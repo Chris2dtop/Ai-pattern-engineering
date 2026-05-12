@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MockRegenerateButton } from "@/components/ai/mock-regenerate-button";
 import { useProjectDraft } from "@/components/project-state";
 import { EditableTable } from "@/components/ui/editable-table";
 import { SectionCard } from "@/components/ui/section-card";
@@ -31,7 +32,15 @@ export function MakerDemo({ projectId }: MakerDemoProps) {
       <SectionCard
         title="Technical overview"
         eyebrow="Maker language"
-        action={<StatusBadge tone="warning">Review required</StatusBadge>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <StatusBadge tone="warning">Review required</StatusBadge>
+            <MockRegenerateButton
+              kind="generate_maker_package"
+              label="Regenerate maker package"
+            />
+          </div>
+        }
       >
         <p className="max-w-4xl leading-7 text-ink/70">
           {draft.maker.technicalOverview}

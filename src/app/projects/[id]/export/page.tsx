@@ -1,9 +1,15 @@
 import { AppShell } from "@/components/app-shell";
 import { ExportDemo } from "@/components/screens/export-demo";
 
-export default function ExportPage({ params }: { params: { id: string } }) {
+export default async function ExportPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   return (
-    <AppShell projectId={params.id} title="Export Review" status="Sprint 1A mock">
+    <AppShell projectId={id} title="Export Review" status="Sprint 1C mock AI">
       <ExportDemo />
     </AppShell>
   );

@@ -1,14 +1,16 @@
 import { AppShell } from "@/components/app-shell";
 import { PatternMapDemo } from "@/components/screens/pattern-map-demo";
 
-export default function PatternMapPage({
+export default async function PatternMapPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+
   return (
-    <AppShell projectId={params.id} title="Pattern Map" status="Sprint 1A mock">
-      <PatternMapDemo projectId={params.id} />
+    <AppShell projectId={id} title="Pattern Map" status="Sprint 1C mock AI">
+      <PatternMapDemo projectId={id} />
     </AppShell>
   );
 }

@@ -1,10 +1,16 @@
 import { AppShell } from "@/components/app-shell";
 import { MakerDemo } from "@/components/screens/maker-demo";
 
-export default function MakerPage({ params }: { params: { id: string } }) {
+export default async function MakerPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   return (
-    <AppShell projectId={params.id} title="Maker / Tailor Mode" status="Sprint 1A mock">
-      <MakerDemo projectId={params.id} />
+    <AppShell projectId={id} title="Maker / Tailor Mode" status="Sprint 1C mock AI">
+      <MakerDemo projectId={id} />
     </AppShell>
   );
 }

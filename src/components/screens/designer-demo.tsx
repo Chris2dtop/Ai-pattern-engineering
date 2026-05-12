@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MockRegenerateButton } from "@/components/ai/mock-regenerate-button";
 import { useProjectDraft } from "@/components/project-state";
 import { EditableTextarea } from "@/components/ui/editable-textarea";
 import { SectionCard } from "@/components/ui/section-card";
@@ -41,7 +42,15 @@ export function DesignerDemo({ projectId }: DesignerDemoProps) {
       <SectionCard
         title="Editable designer interpretation"
         eyebrow="Plain language"
-        action={<StatusBadge tone="success">Draft ready</StatusBadge>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <StatusBadge tone="success">Draft ready</StatusBadge>
+            <MockRegenerateButton
+              kind="generate_designer_draft"
+              label="Regenerate designer draft"
+            />
+          </div>
+        }
       >
         <div className="grid gap-4">
           <EditableTextarea

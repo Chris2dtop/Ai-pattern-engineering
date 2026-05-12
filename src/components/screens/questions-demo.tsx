@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MockRegenerateButton } from "@/components/ai/mock-regenerate-button";
 import { useProjectDraft } from "@/components/project-state";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -22,9 +23,15 @@ export function QuestionsDemo({ projectId }: QuestionsDemoProps) {
         title="AI clarification pass"
         eyebrow="Mock questions"
         action={
-          <StatusBadge tone={requiredAnswered ? "success" : "warning"}>
-            {requiredAnswered ? "Required answered" : "Needs input"}
-          </StatusBadge>
+          <div className="flex flex-wrap gap-2">
+            <StatusBadge tone={requiredAnswered ? "success" : "warning"}>
+              {requiredAnswered ? "Required answered" : "Needs input"}
+            </StatusBadge>
+            <MockRegenerateButton
+              kind="generate_clarifications"
+              label="Regenerate questions"
+            />
+          </div>
         }
       >
         <p className="mb-5 max-w-3xl leading-7 text-ink/70">

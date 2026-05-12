@@ -6,7 +6,10 @@ import {
   designerDraft,
   exportChecklist,
   pomRows,
+  patternJoins,
+  patternPieces,
 } from "@/lib/mock/demo-project";
+import type { AiJobKind, ModelTier } from "@/lib/ai/types";
 
 export const PROJECT_DRAFT_SCHEMA_VERSION = 1;
 export const PROJECT_DRAFT_STORAGE_KEY_PREFIX =
@@ -62,6 +65,45 @@ export type ProjectDraftChecklistItem = {
   complete: boolean;
 };
 
+export type ProjectDraftPatternPiece = {
+  id: string;
+  name: string;
+  material: string;
+  cut: string;
+  confidence: string;
+  risk: string;
+};
+
+export type ProjectDraftPatternJoin = {
+  id: string;
+  from: string;
+  to: string;
+  join: string;
+  risk: string;
+};
+
+export type ProjectDraftAiJob = {
+  id: string;
+  kind: AiJobKind;
+  status: "queued" | "running" | "complete" | "failed";
+  modelTier: ModelTier;
+  modelName: string;
+  message: string;
+  startedAt: string;
+  completedAt?: string;
+};
+
+export type ProjectDraftAiUsageEvent = {
+  id: string;
+  jobId: string;
+  kind: AiJobKind;
+  modelName: string;
+  modelTier: ModelTier;
+  estimatedCostUsd: number;
+  latencyMs: number;
+  createdAt: string;
+};
+
 export type PersistedProjectDraft = {
   schemaVersion: number;
   projectId: string;
@@ -76,9 +118,18 @@ export type PersistedProjectDraft = {
     bomRows: ProjectDraftBomRow[];
     constructionSteps: string[];
   };
+  patternMap: {
+    pieces: ProjectDraftPatternPiece[];
+    joins: ProjectDraftPatternJoin[];
+    lastRegeneratedAt?: string;
+  };
   exportReview: {
     checklist: ProjectDraftChecklistItem[];
     warningsAccepted: boolean;
+  };
+  ai: {
+    jobs: ProjectDraftAiJob[];
+    usageEvents: ProjectDraftAiUsageEvent[];
   };
 };
 
@@ -176,6 +227,113 @@ function toChecklistItem(
   };
 }
 
+function toPatternPiece(item: unknown, index: number): ProjectDraftPatternPiece {
+  const fallback = createDemoProjectDraft().patternMap.pieces[index];
+
+  if (typeof item !== "object" || item === null) {
+    return fallback ?? {
+      id: `piece-${index + 1}`,
+      name: "",
+      material: "",
+      cut: "",
+      confidence: "Low",
+      risk: "Review required",
+    };
+  }
+
+  const candidate = item as Partial<ProjectDraftPatternPiece>;
+
+  return {
+    id: asString(candidate.id, fallback?.id ?? `piece-${index + 1}`),
+    name: asString(candidate.name, fallback?.name ?? ""),
+    material: asString(candidate.material, fallback?.material ?? ""),
+    cut: asString(candidate.cut, fallback?.cut ?? ""),
+    confidence: asString(candidate.confidence, fallback?.confidence ?? "Low"),
+    risk: asString(candidate.risk, fallback?.risk ?? "Review required"),
+  };
+}
+
+function toPatternJoin(item: unknown, index: number): ProjectDraftPatternJoin {
+  const fallback = createDemoProjectDraft().patternMap.joins[index];
+
+  if (typeof item !== "object" || item === null) {
+    return fallback ?? {
+      id: `join-${index + 1}`,
+      from: "",
+      to: "",
+      join: "",
+      risk: "Review",
+    };
+  }
+
+  const candidate = item as Partial<ProjectDraftPatternJoin>;
+
+  return {
+    id: asString(candidate.id, fallback?.id ?? `join-${index + 1}`),
+    from: asString(candidate.from, fallback?.from ?? ""),
+    to: asString(candidate.to, fallback?.to ?? ""),
+    join: asString(candidate.join, fallback?.join ?? ""),
+    risk: asString(candidate.risk, fallback?.risk ?? "Review"),
+  };
+}
+
+function toAiJob(item: unknown, index: number): ProjectDraftAiJob | null {
+  if (typeof item !== "object" || item === null) {
+    return null;
+  }
+
+  const candidate = item as Partial<ProjectDraftAiJob>;
+  const kind = candidate.kind;
+  const status = candidate.status;
+  const modelTier = candidate.modelTier;
+
+  if (!kind || !status || !modelTier) {
+    return null;
+  }
+
+  return {
+    id: asString(candidate.id, `job-${index + 1}`),
+    kind,
+    status,
+    modelTier,
+    modelName: asString(candidate.modelName, "mock-gemini-flash"),
+    message: asString(candidate.message),
+    startedAt: asString(candidate.startedAt, new Date(0).toISOString()),
+    completedAt: candidate.completedAt,
+  };
+}
+
+function toAiUsageEvent(
+  item: unknown,
+  index: number,
+): ProjectDraftAiUsageEvent | null {
+  if (typeof item !== "object" || item === null) {
+    return null;
+  }
+
+  const candidate = item as Partial<ProjectDraftAiUsageEvent>;
+  const kind = candidate.kind;
+  const modelTier = candidate.modelTier;
+
+  if (!kind || !modelTier) {
+    return null;
+  }
+
+  return {
+    id: asString(candidate.id, `usage-${index + 1}`),
+    jobId: asString(candidate.jobId),
+    kind,
+    modelName: asString(candidate.modelName, "mock-gemini-flash"),
+    modelTier,
+    estimatedCostUsd:
+      typeof candidate.estimatedCostUsd === "number"
+        ? candidate.estimatedCostUsd
+        : 0,
+    latencyMs: typeof candidate.latencyMs === "number" ? candidate.latencyMs : 0,
+    createdAt: asString(candidate.createdAt, new Date(0).toISOString()),
+  };
+}
+
 function emptyPomRow(index: number): ProjectDraftPomRow {
   return {
     id: `pom-${index + 1}`,
@@ -269,6 +427,16 @@ export function createDemoProjectDraft(projectId = demoProject.id): PersistedPro
       })),
       constructionSteps: [...constructionSteps],
     },
+    patternMap: {
+      pieces: patternPieces,
+      joins: patternJoins.map(([from, to, join, risk], index) => ({
+        id: `join-${index + 1}`,
+        from,
+        to,
+        join,
+        risk,
+      })),
+    },
     exportReview: {
       checklist: exportChecklist.map(([label, complete], index) => ({
         id: `check-${index + 1}`,
@@ -276,6 +444,10 @@ export function createDemoProjectDraft(projectId = demoProject.id): PersistedPro
         complete,
       })),
       warningsAccepted: false,
+    },
+    ai: {
+      jobs: [],
+      usageEvents: [],
     },
   };
 }
@@ -294,7 +466,9 @@ export function normalizePersistedProjectDraft(
   const concept = candidate.concept;
   const designerText = candidate.designerText;
   const maker = candidate.maker;
+  const patternMap = candidate.patternMap;
   const exportReview = candidate.exportReview;
+  const ai = candidate.ai;
 
   return {
     schemaVersion:
@@ -351,6 +525,15 @@ export function normalizePersistedProjectDraft(
         fallback.maker.constructionSteps,
       ),
     },
+    patternMap: {
+      pieces: Array.isArray(patternMap?.pieces)
+        ? patternMap.pieces.map(toPatternPiece)
+        : fallback.patternMap.pieces,
+      joins: Array.isArray(patternMap?.joins)
+        ? patternMap.joins.map(toPatternJoin)
+        : fallback.patternMap.joins,
+      lastRegeneratedAt: asString(patternMap?.lastRegeneratedAt, undefined),
+    },
     exportReview: {
       checklist: Array.isArray(exportReview?.checklist)
         ? exportReview.checklist.map(toChecklistItem)
@@ -359,6 +542,16 @@ export function normalizePersistedProjectDraft(
         exportReview?.warningsAccepted,
         fallback.exportReview.warningsAccepted,
       ),
+    },
+    ai: {
+      jobs: Array.isArray(ai?.jobs)
+        ? ai.jobs.map(toAiJob).filter((job): job is ProjectDraftAiJob => Boolean(job))
+        : fallback.ai.jobs,
+      usageEvents: Array.isArray(ai?.usageEvents)
+        ? ai.usageEvents
+            .map(toAiUsageEvent)
+            .filter((event): event is ProjectDraftAiUsageEvent => Boolean(event))
+        : fallback.ai.usageEvents,
     },
   };
 }
